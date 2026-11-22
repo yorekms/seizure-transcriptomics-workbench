@@ -1,0 +1,907 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Seizure Transcriptomics Workbench — Rab-Associated Pathway Analysis &amp; Neuronal Effect Forecasting</title>
+<meta name="description" content="Seizure Transcriptomics Workbench: a traceable cross-species framework for Rab-associated endosomal, lysosomal, and phagosomal pathway analysis and retrospective neuronal effect forecasting (University of Virginia).">
+<style>
+  :root {
+    --bg: #070d19;
+    --card: #0f172a;
+    --card2: #111c33;
+    --border: #1e293b;
+    --border-hi: #334155;
+    --text: #e2e8f0;
+    --muted: #94a3b8;
+    --sky: #38bdf8;
+    --emerald: #10b981;
+    --emerald-hi: #34d399;
+    --amber: #f59e0b;
+    --rose: #f43f5e;
+    --violet: #a78bfa;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Inter, sans-serif;
+    background: radial-gradient(circle at 18% 0%, #0d2b2b 0%, #0a172c 35%, #070d19 70%);
+    color: var(--text);
+    min-height: 100vh;
+    line-height: 1.6;
+  }
+  .wrap { max-width: 1200px; margin: 0 auto; padding: 36px 22px 72px; }
+
+  header { border-bottom: 1px solid var(--border); padding-bottom: 26px; margin-bottom: 28px; }
+  .eyebrow {
+    display: inline-block; padding: 4px 12px; border-radius: 999px;
+    font-size: 11.5px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;
+    background: rgba(16, 185, 129, 0.14); color: var(--emerald-hi);
+    border: 1px solid rgba(16, 185, 129, 0.35); margin-bottom: 12px;
+  }
+  h1 { font-size: clamp(25px, 3.2vw, 35px); color: #f8fafc; letter-spacing: -0.02em; line-height: 1.2; margin-bottom: 10px; }
+  .authors { font-size: 15px; color: #fde68a; font-weight: 700; margin-bottom: 4px; }
+  .affil { font-size: 13.5px; color: #cbd5e1; margin-bottom: 10px; }
+  .sub { font-size: 14px; color: var(--muted); max-width: 960px; }
+
+  .pill-bar { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
+  a.nav-pill {
+    display: inline-flex; align-items: center; gap: 6px; padding: 7px 13px;
+    border-radius: 999px; font-size: 12.2px; font-weight: 700; text-decoration: none;
+    color: #cbd5e1; background: #0f172a; border: 1px solid #334155; transition: all .16s ease;
+  }
+  a.nav-pill:hover { border-color: var(--sky); color: #fff; transform: translateY(-1px); background: #16233d; }
+  a.nav-pill.featured {
+    background: linear-gradient(135deg, #0ea5e9, #2563eb); border-color: var(--sky); color: #fff;
+    box-shadow: 0 4px 14px rgba(14, 165, 233, 0.28);
+  }
+  a.nav-pill.bio {
+    border-color: rgba(16, 185, 129, 0.5); color: #6ee7b7; background: rgba(6, 78, 59, 0.34);
+  }
+  a.nav-pill.bio:hover { border-color: var(--emerald); color: #ecfdf5; background: rgba(6, 95, 70, 0.55); }
+  a.nav-pill.rose {
+    border-color: rgba(244, 63, 94, 0.48); color: #fda4af; background: rgba(136, 19, 55, 0.28);
+  }
+  a.nav-pill.rose:hover { border-color: var(--rose); color: #fff1f2; background: rgba(159, 18, 57, 0.48); }
+
+  .jump-bar {
+    position: sticky; top: 10px; z-index: 40;
+    display: flex; flex-wrap: wrap; align-items: center; gap: 7px;
+    padding: 9px 14px; margin-bottom: 24px; border-radius: 14px;
+    background: rgba(15, 23, 42, 0.88); border: 1px solid rgba(52, 211, 153, 0.3);
+    backdrop-filter: blur(12px); box-shadow: 0 10px 28px rgba(0, 0, 0, 0.42);
+  }
+  .jump-lbl { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.07em; color: var(--emerald-hi); margin-right: 4px; }
+  .jump-bar a {
+    font-size: 12px; font-weight: 700; color: #e2e8f0; text-decoration: none;
+    padding: 4px 10px; border-radius: 8px; background: rgba(30, 41, 59, 0.72); border: 1px solid transparent; transition: .15s;
+  }
+  .jump-bar a:hover { border-color: var(--emerald-hi); color: #fff; background: rgba(6, 78, 59, 0.45); }
+
+  .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(235px, 1fr)); gap: 14px; margin-bottom: 28px; }
+  .kpi {
+    background: var(--card); border: 1px solid var(--border); border-radius: 14px;
+    padding: 16px 18px; border-top-width: 3px;
+  }
+  .kpi.em { border-top-color: var(--emerald); }
+  .kpi.sk { border-top-color: var(--sky); }
+  .kpi.am { border-top-color: var(--amber); }
+  .kpi.vi { border-top-color: var(--violet); }
+  .kpi-val { font-size: 26px; font-weight: 900; color: #fff; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
+  .kpi-unit { font-size: 13px; font-weight: 700; color: var(--emerald-hi); margin-left: 4px; }
+  .kpi.sk .kpi-unit { color: var(--sky); }
+  .kpi.am .kpi-unit { color: #fbbf24; }
+  .kpi.vi .kpi-unit { color: #c4b5fd; }
+  .kpi-desc { font-size: 12.2px; color: var(--muted); margin-top: 4px; line-height: 1.45; }
+
+  section.panel {
+    background: var(--card); border: 1px solid var(--border); border-radius: 18px;
+    padding: 26px; margin-bottom: 24px;
+  }
+  .sec-eyebrow { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; color: var(--emerald-hi); margin-bottom: 4px; }
+  .sec-hdr { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 12px; margin-bottom: 18px; }
+  .sec-hdr h2 { font-size: 22px; font-weight: 800; color: #f8fafc; letter-spacing: -0.015em; }
+  .sec-note { font-size: 12.5px; color: var(--muted); }
+
+  .abstract-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(290px, 1fr)); gap: 16px; margin-bottom: 18px; }
+  .abs-box {
+    background: rgba(2, 6, 23, 0.55); border: 1px solid var(--border); border-radius: 13px; padding: 16px 18px;
+  }
+  .abs-box h3 { font-size: 12.5px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em; color: var(--sky); margin-bottom: 8px; }
+  .abs-box p { font-size: 13.4px; color: #cbd5e1; line-height: 1.62; }
+
+  .callout {
+    background: linear-gradient(90deg, rgba(16, 185, 129, 0.12), rgba(56, 189, 248, 0.08));
+    border: 1px solid rgba(16, 185, 129, 0.32); border-left: 4px solid var(--emerald);
+    border-radius: 12px; padding: 13px 16px; font-size: 13px; color: #e2e8f0;
+  }
+  .callout strong { color: #fff; }
+
+  .methods-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(290px, 1fr)); gap: 15px; margin-top: 16px; }
+  .m-card { background: var(--card2); border: 1px solid var(--border); border-radius: 13px; padding: 16px; }
+  .m-card h3 { font-size: 14.5px; color: #f8fafc; margin-bottom: 6px; }
+  .m-card p, .m-card li { font-size: 12.8px; color: #cbd5e1; line-height: 1.55; }
+  .m-card ul { margin: 6px 0 0 17px; }
+
+  /* Rab visual forecast strip */
+  .rab-controls { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+  .rab-btn {
+    padding: 6px 11px; border-radius: 999px; font-size: 11.8px; font-weight: 700;
+    background: #1e293b; color: #cbd5e1; border: 1px solid #334155; cursor: pointer; font-family: inherit; transition: .15s;
+  }
+  .rab-btn:hover { border-color: var(--emerald-hi); color: #fff; }
+  .rab-btn.active { background: var(--emerald); color: #052e16; border-color: var(--emerald-hi); }
+  .rab-list { display: flex; flex-direction: column; gap: 9px; margin-top: 14px; }
+  .rab-row {
+    display: grid; grid-template-columns: 78px 135px 1fr 145px; gap: 12px; align-items: center;
+    background: rgba(2, 6, 23, 0.52); border: 1px solid var(--border); border-radius: 11px; padding: 9px 13px;
+  }
+  @media (max-width: 780px) { .rab-row { grid-template-columns: 70px 1fr; } }
+  .rab-gene { font-weight: 800; font-size: 13.5px; color: #f8fafc; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+  .rab-metric { font-size: 11.8px; color: #cbd5e1; font-variant-numeric: tabular-nums; }
+  .rab-bar-wrap { position: relative; height: 22px; background: #0f172a; border: 1px solid #263449; border-radius: 999px; overflow: hidden; }
+  .rab-bar-fill { height: 100%; border-radius: 999px; transition: width .25s ease; }
+  .rab-tick { position: absolute; top: 0; bottom: 0; width: 1.5px; background: rgba(248, 250, 252, 0.35); pointer-events: none; }
+  .rab-tick.t90 { background: rgba(245, 158, 11, 0.72); }
+  .rab-bar-txt { position: absolute; inset: 0; display: flex; align-items: center; justify-content: space-between; padding: 0 10px; font-size: 11.3px; font-weight: 700; color: #f8fafc; text-shadow: 0 1px 2px rgba(0,0,0,0.8); }
+  .badge-dir {
+    display: inline-block; padding: 2px 7px; border-radius: 999px; font-size: 10.8px; font-weight: 800;
+  }
+  .badge-down { background: rgba(56, 189, 248, 0.16); color: #7dd3fc; border: 1px solid rgba(56, 189, 248, 0.38); }
+  .badge-up { background: rgba(245, 158, 11, 0.16); color: #fcd34d; border: 1px solid rgba(245, 158, 11, 0.38); }
+  .badge-na { background: rgba(148, 163, 184, 0.12); color: #94a3b8; border: 1px solid rgba(148, 163, 184, 0.25); }
+  .badge-sig { background: rgba(16, 185, 129, 0.18); color: #6ee7b7; border: 1px solid rgba(16, 185, 129, 0.42); }
+
+  /* Figures Gallery */
+  .fig-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(460px, 1fr)); gap: 18px; }
+  @media (max-width: 560px) { .fig-grid { grid-template-columns: 1fr; } }
+  .fig-card {
+    background: var(--card2); border: 1px solid var(--border); border-radius: 15px;
+    overflow: hidden; display: flex; flex-direction: column; transition: .18s;
+  }
+  .fig-card:hover { border-color: var(--emerald); transform: translateY(-2px); box-shadow: 0 14px 32px rgba(0,0,0,0.45); }
+  .fig-card.wide { grid-column: 1 / -1; }
+  .fig-img-wrap {
+    background: #ffffff; padding: 12px; cursor: zoom-in; position: relative;
+    display: flex; align-items: center; justify-content: center; min-height: 240px;
+  }
+  .fig-img-wrap img { max-width: 100%; max-height: 440px; object-fit: contain; display: block; }
+  .fig-card.wide .fig-img-wrap img { max-height: 560px; }
+  .zoom-hint {
+    position: absolute; bottom: 8px; right: 10px;
+    background: rgba(15, 23, 42, 0.85); color: #e2e8f0;
+    padding: 3px 9px; border-radius: 999px; font-size: 11px; font-weight: 700;
+  }
+  .fig-body { padding: 15px 18px 18px; flex: 1; }
+  .fig-tag { font-size: 10.8px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em; color: var(--emerald-hi); margin-bottom: 4px; }
+  .fig-body h3 { font-size: 16px; color: #f8fafc; margin-bottom: 6px; line-height: 1.3; }
+  .fig-body p { font-size: 12.6px; color: #cbd5e1; line-height: 1.55; }
+
+  .supp-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 14px; margin-top: 16px; }
+  .supp-card {
+    background: var(--card2); border: 1px solid var(--border); border-radius: 13px; overflow: hidden;
+    display: flex; flex-direction: column;
+  }
+  .supp-card .fig-img-wrap { min-height: 170px; padding: 8px; }
+  .supp-card .fig-img-wrap img { max-height: 200px; }
+  .supp-card .fig-body { padding: 12px 14px; }
+  .supp-card .fig-body h3 { font-size: 13.8px; }
+
+  /* Interactive Data Explorer */
+  .tabs-bar { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
+  .tab-btn {
+    padding: 8px 14px; border-radius: 10px; font-size: 12.5px; font-weight: 700;
+    background: #162036; color: #cbd5e1; border: 1px solid var(--border-hi); cursor: pointer; font-family: inherit; transition: .15s;
+  }
+  .tab-btn:hover { border-color: var(--sky); color: #fff; }
+  .tab-btn.active { background: linear-gradient(135deg, #059669, #0284c7); color: #fff; border-color: transparent; }
+
+  .tbl-toolbar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 12px; }
+  .search-input {
+    flex: 1; min-width: 240px; max-width: 440px; padding: 9px 13px; border-radius: 10px;
+    background: #091020; border: 1px solid var(--border-hi); color: #f8fafc; font-size: 13px; font-family: inherit;
+  }
+  .search-input:focus { outline: none; border-color: var(--emerald-hi); }
+  .tbl-meta { font-size: 12.2px; color: var(--muted); display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .csv-dl-btn {
+    display: inline-flex; align-items: center; gap: 6px; padding: 7px 12px; border-radius: 9px;
+    background: rgba(16, 185, 129, 0.16); border: 1px solid rgba(16, 185, 129, 0.45);
+    color: #6ee7b7; text-decoration: none; font-size: 12px; font-weight: 700;
+  }
+  .csv-dl-btn:hover { background: rgba(16, 185, 129, 0.28); color: #fff; }
+
+  .tbl-scroll { overflow-x: auto; border: 1px solid var(--border); border-radius: 12px; background: #091020; max-height: 520px; overflow-y: auto; }
+  table.data-tbl { width: 100%; border-collapse: collapse; font-size: 12.3px; }
+  table.data-tbl thead th {
+    position: sticky; top: 0; z-index: 2; background: #132038; color: #e2e8f0;
+    padding: 10px 11px; text-align: left; font-weight: 800; border-bottom: 1px solid var(--border-hi);
+    cursor: pointer; white-space: nowrap; user-select: none;
+  }
+  table.data-tbl thead th:hover { color: var(--emerald-hi); }
+  table.data-tbl tbody td { padding: 8px 11px; border-bottom: 1px solid rgba(30, 41, 59, 0.72); color: #cbd5e1; vertical-align: top; }
+  table.data-tbl tbody tr:hover { background: rgba(56, 189, 248, 0.08); }
+  table.data-tbl a { color: var(--sky); text-decoration: none; font-weight: 600; }
+  table.data-tbl a:hover { text-decoration: underline; }
+  .mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 11.8px; }
+
+  /* Software & Downloads cards */
+  .dl-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 15px; }
+  .dl-card {
+    background: var(--card2); border: 1px solid var(--border); border-radius: 14px; padding: 18px;
+    display: flex; flex-direction: column; justify-content: space-between; gap: 12px;
+  }
+  .dl-card h3 { font-size: 15.5px; color: #f8fafc; margin-bottom: 5px; }
+  .dl-card p { font-size: 12.8px; color: var(--muted); }
+  a.btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 7px;
+    padding: 10px 14px; border-radius: 10px; text-decoration: none; font-size: 13px; font-weight: 700;
+    border: 1px solid #334155; background: #1e293b; color: #f8fafc; transition: .15s; text-align: center;
+  }
+  a.btn:hover { filter: brightness(1.12); transform: translateY(-1px); }
+  a.btn.emerald { background: linear-gradient(135deg, #059669, #047857); border: none; }
+  a.btn.sky { background: linear-gradient(135deg, #0284c7, #2563eb); border: none; }
+
+  /* Lightbox modal */
+  .lightbox {
+    display: none; position: fixed; inset: 0; z-index: 9999;
+    background: rgba(2, 6, 23, 0.94); backdrop-filter: blur(8px);
+    align-items: center; justify-content: center; flex-direction: column; padding: 24px;
+  }
+  .lightbox.open { display: flex; }
+  .lb-inner { max-width: min(96vw, 1380px); max-height: 82vh; background: #fff; border-radius: 12px; padding: 12px; overflow: auto; }
+  .lb-inner img { display: block; max-width: 100%; max-height: 78vh; object-fit: contain; margin: 0 auto; }
+  .lb-caption { max-width: 1060px; margin-top: 12px; text-align: center; font-size: 13px; color: #e2e8f0; }
+  .lb-bar { display: flex; gap: 10px; margin-bottom: 10px; align-items: center; }
+  .lb-btn {
+    padding: 7px 14px; border-radius: 999px; background: #1e293b; color: #f8fafc;
+    border: 1px solid #475569; font-weight: 700; font-size: 12.5px; cursor: pointer; font-family: inherit;
+  }
+  .lb-btn:hover { border-color: var(--emerald-hi); background: #064e3b; }
+
+  footer {
+    border-top: 1px solid var(--border); padding-top: 20px; margin-top: 28px;
+    font-size: 12.4px; color: var(--muted); display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px; align-items: center;
+  }
+  footer a { color: var(--sky); text-decoration: none; font-weight: 600; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="eyebrow">Seizure Bioinformatics &bull; Cross-Species Transcriptomics &bull; Software Suite v0.7.4.3</div>
+    <h1>Seizure Transcriptomics Workbench: A Traceable Framework for Rab-Associated Pathway Analysis and Neuronal Effect Forecasting</h1>
+    <div class="authors">Matthew S. Yorek, M.S.<sup>1</sup>, Bettina Winckler, Ph.D.<sup>2</sup>, and Manoj K. Patel, Ph.D.<sup>1</sup></div>
+    <div class="affil"><sup>1</sup>Department of Anesthesiology &amp; <sup>2</sup>Department of Cell Biology, University of Virginia, Charlottesville, VA &bull; Working Manuscript &amp; Reproducible Research Portal</div>
+    <p class="sub">Traceable multi-species integration of <strong>44 source contrasts across 15 public GEO accessions</strong> (plus two prior-estimation resources and the external 16-donor human <strong>Epilepsy19</strong> neuronal cohort), uniting a 311-gene predefined atlas, R <code>edgeR</code>/<code>limma-voom</code> &amp; MATLAB/Python empirical-Bayes adapters, and retrospective Bayesian expression-effect forecasting.</p>
+    <div class="pill-bar">
+      <a class="nav-pill featured" href="https://my-scientist.carrd.co" target="_blank" rel="noopener">&#x1F310; my-scientist.carrd.co</a>
+      <a class="nav-pill rose" href="https://yorekms.github.io/condensate-pharmacology/" target="_blank" rel="noopener">&#x1F9EA; Preprints Hub (Condensate Papers #1&ndash;#2)</a>
+      <a class="nav-pill bio" href="https://my-scientific-software.carrd.co" target="_blank" rel="noopener">&#x1F4BB; my-scientific-software.carrd.co</a>
+      <a class="nav-pill" href="https://my-clampflow.carrd.co" target="_blank" rel="noopener">&#x1F4C8; ClampFlow ABF</a>
+      <a class="nav-pill" href="https://orcid.org/0000-0002-4737-9367" target="_blank" rel="noopener">ORCID: 0000-0002-4737-9367</a>
+      <a class="nav-pill" href="https://www.ncbi.nlm.nih.gov/myncbi/1XAQAfuLLOMkz/bibliography/public/" target="_blank" rel="noopener">NCBI MyBibliography</a>
+      <a class="nav-pill" href="https://github.com/yorekms/seizure-transcriptomics-workbench" target="_blank" rel="noopener">GitHub Repo</a>
+    </div>
+  </header>
+
+  <nav class="jump-bar" aria-label="Page sections">
+    <span class="jump-lbl">Portal Sections:</span>
+    <a href="#abstract">Abstract &amp; Methods</a>
+    <a href="#rab-explorer">Rab Forecast Visualizer</a>
+    <a href="#figures">Main Figures (1&ndash;5)</a>
+    <a href="#supplements">Supplements (S1&ndash;S5)</a>
+    <a href="#tables">Interactive Data Tables</a>
+    <a href="#software">Software v0.7.4.3 &amp; Papers</a>
+  </nav>
+
+  <!-- KPI RIBBON -->
+  <div class="kpi-grid">
+    <div class="kpi em">
+      <div class="kpi-val">44 <span class="kpi-unit">Contrasts</span></div>
+      <div class="kpi-desc">15 public GEO accessions + 2 prior resources + external 16-donor human <strong>Epilepsy19</strong> neuronal cohort (frozen inventory).</div>
+    </div>
+    <div class="kpi sk">
+      <div class="kpi-val">311 <span class="kpi-unit">Atlas Genes</span></div>
+      <div class="kpi-desc">10 predefined biological panels (441 memberships), anchored by a 4-panel, 134-gene Rab7/endolysosomal mechanistic core.</div>
+    </div>
+    <div class="kpi am">
+      <div class="kpi-val">29 <span class="kpi-unit">3-Species Shared</span></div>
+      <div class="kpi-desc"><strong>8 increases</strong> &amp; <strong>21 decreases</strong> (including <code>RAB3A</code> &amp; <code>SLC6A1</code>) across human, mouse &amp; rat under strict orthology.</div>
+    </div>
+    <div class="kpi vi">
+      <div class="kpi-val">96.0% <span class="kpi-unit">95% PI Coverage</span></div>
+      <div class="kpi-desc">226 scored candidates vs. human neuronal donors (47.3% point-sign agreement; <strong>+0.0325</strong> mean log-score gain over default).</div>
+    </div>
+  </div>
+
+  <!-- ABSTRACT & METHODOLOGICAL ARCHITECTURE -->
+  <section id="abstract" class="panel">
+    <div class="sec-eyebrow">Manuscript Overview &bull; Frozen Evidence Set</div>
+    <div class="sec-hdr">
+      <h2>Abstract &amp; Traceable Study Architecture</h2>
+      <span class="sec-note">5 Main Figures &bull; 4 Editable Tables &bull; Complete Frozen CSVs</span>
+    </div>
+    <div class="abstract-grid">
+      <div class="abs-box">
+        <h3>Background</h3>
+        <p>Seizure transcriptomes differ in species, tissue composition, and timing, complicating the interpretation of genes that motivate mechanistic experiments (including laboratory observations of seizures and early death in <em>Rab7-flox &times; CamkII-Cre</em> mice). We developed a traceable workflow to assess Rab-associated endosomal, lysosomal, and phagosomal expression, and to evaluate whether earlier rodent effects inform another human neuronal cohort.</p>
+      </div>
+      <div class="abs-box">
+        <h3>Results</h3>
+        <p>Seizure Transcriptomics Workbench organized 44 source contrasts and a 311-gene predefined atlas. Ten of 14 motivating Rab genes decreased in the human NeuN<sup>+</sup> reference (<code>GSE140393</code>). Under a selected-contrast directional rule, 8 increases and 21 decreases were shared across human, mouse, and rat, including <code>RAB3A</code>. Retrospective Bayesian evaluation scored 226 candidates against donor-level human neuronal data (<code>Epilepsy19</code>): 47.3% point-sign agreement, 96.0% 95%-predictive-interval coverage, and +0.0325 mean log-score increment over the default model. Historical P(decrease) was 0.683 (<code>RAB3A</code>), 0.563 (<code>RAB14</code>), 0.502 (<code>RAB4A</code>), 0.494 (<code>RAB5A</code>), and 0.460 (<code>RAB21</code>); <code>VIM</code> alone combined a high-probability (&ge;0.90) direction forecast with external adjusted-P threshold crossing.</p>
+      </div>
+      <div class="abs-box">
+        <h3>Conclusions</h3>
+        <p>The workflow preserves motivating genes alongside shared signals, uncertainty, and missingness. Results support targeted investigation of membrane-trafficking machinery while showing limited directional transfer from heterogeneous rodent models to human neuronal observations. Continuous probabilities refine experimental prioritization without converting uncertain associations into overstated hits.</p>
+      </div>
+    </div>
+
+    <div class="callout">
+      <strong>Explicit Scope &amp; Statistical Guardrail:</strong> This framework evaluates <strong>retrospective expression-effect forecasting</strong> across public transcriptomic cohorts&mdash;not prospective clinical seizure-status prediction. Contrast bundles sharing animals or controls are tracked explicitly and never counted as independent studies; unavailable measurements and unmapped orthologs remain visibly marked rather than coerced to zero.
+    </div>
+
+    <div class="methods-grid">
+      <div class="m-card">
+        <h3>Identifiable Processing Routes (44 Bundles)</h3>
+        <ul>
+          <li><strong>35 continuous-expression bundles:</strong> native MATLAB empirical-Bayes moderated-<em>t</em></li>
+          <li><strong>5 count bundles:</strong> MATLAB <code>rnaseqde</code></li>
+          <li><strong>2 count refits:</strong> R <code>edgeR</code> TMM + <code>limma-voom</code> (mouse NeuN<sup>+</sup>/NeuN<sup>&minus;</sup>)</li>
+          <li><strong>1 human neuronal reference:</strong> retained author <code>DESeq2</code> (<code>GSE140393</code>)</li>
+          <li><strong>1 splice-feature adapter:</strong> human temporal neocortex ion-channel splicing</li>
+        </ul>
+      </div>
+      <div class="m-card">
+        <h3>Strict Orthology &amp; Missingness Preservation</h3>
+        <p>Formal cross-species matching requires reviewed identifiers and high-confidence one-to-one orthology. Standard errors derive strictly from the source model (<code>|effect / statistic|</code>)&mdash;never back-calculated by inverting adjusted <em>P</em> values. Predefined panel membership encodes the biological hypothesis without post-hoc multiplicity recalculation.</p>
+      </div>
+      <div class="m-card">
+        <h3>External Neuronal Calibration (Epilepsy19)</h3>
+        <p>Retrospective Bayesian priors (estimated separately from <code>GSE198498</code>, <code>GSE213393</code>, and <code>GSE50079</code>) are scored against pan-neuronal donor pseudobulk from snRNA-seq of human temporal cortex (Pfisterer et al., <em>Nat Commun</em> 2020; 8 epilepsy / 8 control donors), comparing default, historical, and doubled-SD sensitivity priors.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- INTERACTIVE RAB FORECAST VISUALIZER -->
+  <section id="rab-explorer" class="panel">
+    <div class="sec-eyebrow">Interactive Model Readout &bull; Table 2 (14 Motivating Human Rab Genes)</div>
+    <div class="sec-hdr">
+      <div>
+        <h2>Continuous Bayesian Rab Forecast Probabilities</h2>
+        <p class="sec-note">Comparing human NeuN<sup>+</sup> reference (<code>GSE140393</code>), historical rodent-prior P(decrease) (vertical ticks at 0.50 &amp; 0.90), and external donor estimates (<code>Epilepsy19</code>).</p>
+      </div>
+      <div class="rab-controls" id="rab-sort-bar">
+        <button class="rab-btn active" data-sort="pdec">Sort: P(decrease)</button>
+        <button class="rab-btn" data-sort="ref">Sort: Human Ref log2FC</button>
+        <button class="rab-btn" data-sort="ext">Sort: External log2FC</button>
+        <button class="rab-btn" data-sort="gene">Sort: Gene</button>
+      </div>
+    </div>
+    <div id="rab-visual-list" class="rab-list">
+      <div style="color:var(--muted);font-size:13px;">Loading Table 2 Rab probabilities&hellip;</div>
+    </div>
+  </section>
+
+  <!-- MAIN FIGURES 1-5 -->
+  <section id="figures" class="panel">
+    <div class="sec-eyebrow">Publication Figures &bull; Native MATLAB &amp; Python Exports</div>
+    <div class="sec-hdr">
+      <div>
+        <h2>Main Figures 1&ndash;5 (Click Any Figure to Zoom)</h2>
+        <p class="sec-note">High-resolution native figures with full verified legends and direct vector/print PDF downloads.</p>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <a class="csv-dl-btn" href="assets/figures/Main_figures_1_to_5__20260912_v6_legend.pdf" target="_blank" rel="noopener">&#x1F4C4; Download Main Figures 1&ndash;5 PDF (4.1 MB)</a>
+        <a class="csv-dl-btn" href="assets/figures/Selected_supplements_S1_to_S5__20260912_v4.pdf" target="_blank" rel="noopener">&#x1F4C4; Supplements S1&ndash;S5 PDF (4.5 MB)</a>
+      </div>
+    </div>
+
+    <div class="fig-grid">
+      <article class="fig-card wide">
+        <div class="fig-img-wrap" data-lb="0">
+          <img src="assets/figures/Figure_1_Study_Design.png" alt="Figure 1: Study motivation and evidence design" loading="lazy">
+          <span class="zoom-hint">&#x1F50D; Zoom</span>
+        </div>
+        <div class="fig-body">
+          <div class="fig-tag">Figure 1 &bull; Study Architecture</div>
+          <h3>Study Motivation and Traceable Evidence Design</h3>
+          <p>Connects the motivating Rab7 conditional mouse observations with the source study inventory, human neuronal reference, predefined mechanistic panels, rodent contexts, gene-matched concordance, and retrospective forecasting. Contrast counts do not represent independent cohorts; bulk/regional and neuronal preparations retain distinct interpretations.</p>
+        </div>
+      </article>
+
+      <article class="fig-card">
+        <div class="fig-img-wrap" data-lb="1">
+          <img src="assets/figures/Figure_2_Human_NeuN_Rab_Overlap.png" alt="Figure 2: Human neuronal Rab associations and three-species overlap" loading="lazy">
+          <span class="zoom-hint">&#x1F50D; Zoom</span>
+        </div>
+        <div class="fig-body">
+          <div class="fig-tag">Figure 2 &bull; Human Reference &amp; 3-Species Overlap</div>
+          <h3>Human Neuronal Rab Associations &amp; Selected Overlap</h3>
+          <p>Human <code>GSE140393</code> temporal-neocortex NeuN<sup>+</sup> TLE-versus-control effects retaining original source statistics (10/14 motivating Rab genes decreased) alongside saved human, mouse, and rat directional intersections over the common assessed universe (8 shared up, 21 shared down including <code>RAB3A</code>).</p>
+        </div>
+      </article>
+
+      <article class="fig-card">
+        <div class="fig-img-wrap" data-lb="2">
+          <img src="assets/figures/Figure_3_Endolysosomal_Contexts.png" alt="Figure 3: Mechanistic core across sampled seizure contexts" loading="lazy">
+          <span class="zoom-hint">&#x1F50D; Zoom</span>
+        </div>
+        <div class="fig-body">
+          <div class="fig-tag">Figure 3 &bull; 134-Gene Core Across 22 Contexts</div>
+          <h3>Mechanistic Core Across Sampled Seizure Contexts</h3>
+          <p>Displays the four Rab7/endosome, autophagy-to-lysosome, lysosomal-acidification, and phagosome panels (134 unique genes; extended to 311 genes across 10 panels). Colors encode source log<sub>2</sub> fold changes (saturated at &plusmn;4); dots mark source adjusted <em>P</em> &lt; 0.05; gray preserves unavailable measurements.</p>
+        </div>
+      </article>
+
+      <article class="fig-card">
+        <div class="fig-img-wrap" data-lb="3">
+          <img src="assets/figures/Figure_4_NeuN_Concordance.png" alt="Figure 4: Rab and endolysosomal genes across NeuN compartments" loading="lazy">
+          <span class="zoom-hint">&#x1F50D; Zoom</span>
+        </div>
+        <div class="fig-body">
+          <div class="fig-tag">Figure 4 &bull; Cellular Compartment Concordance</div>
+          <h3>Rab &amp; Endolysosomal Genes Across NeuN Compartments</h3>
+          <p>Human <code>GSE140393</code> NeuN<sup>+</sup> source effects plotted against mouse <code>GSE153976</code> NeuN<sup>+</sup> (A; 9,868 shared tested genes) and NeuN<sup>&minus;</sup> (B; 9,869) effects. Triangles/diamonds denote both-up, both-down, and opposed pairs (both adj. <em>P</em> &lt; 0.05); blue open squares mark 93 core-panel genes and black open rings mark 18 motivating genes.</p>
+        </div>
+      </article>
+
+      <article class="fig-card">
+        <div class="fig-img-wrap" data-lb="4">
+          <img src="assets/figures/Figure_5_Rab_Pathway_Forecasts.png" alt="Figure 5: Rab genes and pathway context in external neuronal forecasting" loading="lazy">
+          <span class="zoom-hint">&#x1F50D; Zoom</span>
+        </div>
+        <div class="fig-body">
+          <div class="fig-tag">Figure 5 &bull; External Bayesian Evaluation</div>
+          <h3>Rab Genes &amp; Pathway Context in External Neuronal Forecasting</h3>
+          <p>(A) 14 human Rab genes comparing reference Wald intervals, historical-prior forecast intervals, and external <code>Epilepsy19</code> moderated-<em>t</em> intervals; (B) 27 motivating mechanistic genes; (C) gene coverage, point-sign agreement, and mean log-score gain across prior variants; (D) <code>GFAP</code>, <code>VIM</code>, and <code>HSPB1</code> threshold examples (only <code>VIM</code> crosses both &ge;0.90 forecast probability and external adj. <em>P</em> &lt; 0.05).</p>
+        </div>
+      </article>
+    </div>
+
+    <div id="supplements" style="margin-top:26px;">
+      <div class="sec-eyebrow">Key Supplementary Figures &bull; Sensitivity &amp; Context</div>
+      <div class="supp-grid">
+        <article class="supp-card">
+          <div class="fig-img-wrap" data-lb="5">
+            <img src="assets/figures/Supplement_S1_Lysosomal_Trajectories.png" alt="Supplement S1: Lysosomal context and trajectories" loading="lazy">
+            <span class="zoom-hint">&#x1F50D;</span>
+          </div>
+          <div class="fig-body">
+            <div class="fig-tag">Supplement S1</div>
+            <h3>Lysosomal Context &amp; Trajectories</h3>
+          </div>
+        </article>
+        <article class="supp-card">
+          <div class="fig-img-wrap" data-lb="6">
+            <img src="assets/figures/Supplement_S2_Immediate_Early_Context.png" alt="Supplement S2: Immediate-early gene context" loading="lazy">
+            <span class="zoom-hint">&#x1F50D;</span>
+          </div>
+          <div class="fig-body">
+            <div class="fig-tag">Supplement S2</div>
+            <h3>Immediate-Early Response Context</h3>
+          </div>
+        </article>
+        <article class="supp-card">
+          <div class="fig-img-wrap" data-lb="7">
+            <img src="assets/figures/Supplement_S4_Concordance_Context.png" alt="Supplement S4: Four-panel concordance context" loading="lazy">
+            <span class="zoom-hint">&#x1F50D;</span>
+          </div>
+          <div class="fig-body">
+            <div class="fig-tag">Supplement S4</div>
+            <h3>Four-Panel Cross-Species Concordance</h3>
+          </div>
+        </article>
+        <article class="supp-card">
+          <div class="fig-img-wrap" data-lb="8">
+            <img src="assets/figures/Supplement_S5_Bayesian_Sensitivity.png" alt="Supplement S5: Harmonized Bayesian prior sensitivity" loading="lazy">
+            <span class="zoom-hint">&#x1F50D;</span>
+          </div>
+          <div class="fig-body">
+            <div class="fig-tag">Supplement S5</div>
+            <h3>Harmonized Bayesian Prior Sensitivity</h3>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- INTERACTIVE DATA EXPLORER -->
+  <section id="tables" class="panel">
+    <div class="sec-eyebrow">Frozen Quantitative Tables &bull; Searchable &amp; Sortable</div>
+    <div class="sec-hdr">
+      <div>
+        <h2>Interactive Manuscript Data Explorer</h2>
+        <p class="sec-note">Directly parsed in-browser from the frozen CSV tables&mdash;click any column header to sort or filter across genes, panels, and GEO studies.</p>
+      </div>
+    </div>
+
+    <div class="tabs-bar" id="data-tabs">
+      <button class="tab-btn active" data-tab="rab">Table 2: Rab Probabilities (14)</button>
+      <button class="tab-btn" data-tab="shared">3-Species Shared Genes (29)</button>
+      <button class="tab-btn" data-tab="panels">Table 3: Panel Performance (13)</button>
+      <button class="tab-btn" data-tab="studies">Table 1: Study Inventory (21)</button>
+      <button class="tab-btn" data-tab="core">Table 4: External Core Hits (9)</button>
+    </div>
+
+    <div class="tbl-toolbar">
+      <input id="tbl-search" class="search-input" type="search" placeholder="Filter rows by gene symbol, GEO accession, panel, species, or note&hellip;">
+      <div class="tbl-meta">
+        <span id="tbl-count">Loading&hellip;</span>
+        <a id="tbl-csv-link" class="csv-dl-btn" href="assets/data/Table_2_extended_Rab_probabilities.csv" download>&#x2B07; Download Raw CSV</a>
+      </div>
+    </div>
+
+    <div class="tbl-scroll">
+      <table class="data-tbl" id="data-table">
+        <thead id="tbl-head"></thead>
+        <tbody id="tbl-body"><tr><td style="padding:18px;color:var(--muted);">Loading frozen CSV data&hellip;</td></tr></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- SOFTWARE SUITE & COMPANION LINKS -->
+  <section id="software" class="panel">
+    <div class="sec-eyebrow">Reproducible Code &amp; Companion UVA Research</div>
+    <div class="sec-hdr">
+      <h2>Workbench Source Package (v0.7.4.3) &amp; Related Research</h2>
+      <span class="sec-note">SHA-256 verified MATLAB R2026a + Python companion test suite</span>
+    </div>
+    <div class="dl-grid">
+      <div class="dl-card">
+        <div>
+          <h3>Seizure Transcriptomics Workbench v0.7.4.3</h3>
+          <p>Complete manuscript-grade MATLAB &amp; Python companion source archive (262 validated source files, 100% SHA-256 manifest, 5/5 Python unit tests, 8/8 bounded MATLAB R2026a tests, and R model adapters).</p>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          <a class="btn emerald" href="https://drive.google.com/uc?export=download&id=1tjoOVatIW09pSgyDYWGAnPHAUf2SbsX1" target="_blank" rel="noopener">&#x2B07; Download Manuscript Source ZIP (887 KB)</a>
+          <a class="btn" href="https://my-scientific-software.carrd.co" target="_blank" rel="noopener">View All 14 Software Suites on MY-scientific-software &#x2197;</a>
+        </div>
+      </div>
+
+      <div class="dl-card">
+        <div>
+          <h3>Companion Preprints Hub (Papers #1 &amp; #2)</h3>
+          <p>Return to the UVA research hub featuring our two companion preprints on <strong>Phase-Partitioned Allosteric Pharmacology &amp; Condensate Drug Design</strong> with interactive 3D PDB viewers and CALVADOS MD datasets.</p>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          <a class="btn sky" href="https://yorekms.github.io/condensate-pharmacology/" target="_blank" rel="noopener">&#x1F9EA; Open Condensate Pharmacology Hub &#x2197;</a>
+          <a class="btn" href="https://my-scientist.carrd.co" target="_blank" rel="noopener">&#x1F310; Matthew S. Yorek CV &amp; Bibliometrics &#x2197;</a>
+        </div>
+      </div>
+
+      <div class="dl-card">
+        <div>
+          <h3>Published UVA Epilepsy &amp; Electrophysiology Studies</h3>
+          <p>Companion peer-reviewed SCN8A developmental epileptic encephalopathy studies and open patch-clamp / EEG software pipelines from the Patel Lab at UVA Anesthesiology.</p>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          <a class="btn" href="https://doi.org/10.1172/JCI196402" target="_blank" rel="noopener">JCI (2026): Base Editing Rescues SCN8A Seizures &amp; SUDEP &#x2197;</a>
+          <a class="btn" href="https://my-clampflow.carrd.co" target="_blank" rel="noopener">&#x1F4C8; ClampFlow ABF Patch-Clamp Workbench &#x2197;</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div>&copy; 2026 Matthew S. Yorek, M.S. &bull; University of Virginia Department of Anesthesiology &bull; Frozen Evidence Set (Sept 2026)</div>
+    <div style="display:flex;gap:14px;flex-wrap:wrap;">
+      <a href="https://my-scientist.carrd.co" target="_blank" rel="noopener">my-scientist.carrd.co</a>
+      <a href="https://yorekms.github.io/condensate-pharmacology/" target="_blank" rel="noopener">Condensate Preprints Hub</a>
+      <a href="https://my-scientific-software.carrd.co" target="_blank" rel="noopener">Scientific Software</a>
+      <a href="https://github.com/yorekms/seizure-transcriptomics-workbench" target="_blank" rel="noopener">GitHub Source</a>
+    </div>
+  </footer>
+</div>
+
+<!-- LIGHTBOX -->
+<div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="Figure viewer">
+  <div class="lb-bar">
+    <button class="lb-btn" id="lb-prev" type="button">&larr; Prev</button>
+    <button class="lb-btn" id="lb-next" type="button">Next &rarr;</button>
+    <a class="lb-btn" id="lb-raw" href="#" target="_blank" rel="noopener" style="text-decoration:none;">Open Full Image &#x2197;</a>
+    <button class="lb-btn" id="lb-close" type="button">Close (Esc)</button>
+  </div>
+  <div class="lb-inner"><img id="lb-img" src="" alt=""></div>
+  <div class="lb-caption" id="lb-cap"></div>
+</div>
+
+<script>
+(function () {
+  /* RFC-4180 CSV parser */
+  function parseCSV(text) {
+    const rows = [];
+    let row = [], cell = '', inQuotes = false;
+    for (let i = 0; i < text.length; i++) {
+      const ch = text[i], next = text[i + 1];
+      if (inQuotes) {
+        if (ch === '"' && next === '"') { cell += '"'; i++; }
+        else if (ch === '"') { inQuotes = false; }
+        else { cell += ch; }
+      } else {
+        if (ch === '"') { inQuotes = true; }
+        else if (ch === ',') { row.push(cell); cell = ''; }
+        else if (ch === '\r' && next === '\n') { row.push(cell); rows.push(row); row = []; cell = ''; i++; }
+        else if (ch === '\n' || ch === '\r') { row.push(cell); rows.push(row); row = []; cell = ''; }
+        else { cell += ch; }
+      }
+    }
+    if (cell.length || row.length) { row.push(cell); rows.push(row); }
+    if (!rows.length) return [];
+    const headers = rows[0].map(h => h.trim());
+    return rows.slice(1).filter(r => r.some(c => c.trim() !== '')).map(r => {
+      const obj = {};
+      headers.forEach((h, idx) => { obj[h] = (r[idx] || '').trim(); });
+      return obj;
+    });
+  }
+
+  function esc(s) {
+    return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  }
+  function fmtNum(v, d = 3) {
+    if (v === '' || v == null || isNaN(Number(v))) return '—';
+    const n = Number(v);
+    if (Math.abs(n) > 0 && Math.abs(n) < 0.0005) return n.toExponential(2);
+    return n.toFixed(d);
+  }
+  function fmtPct(v) {
+    if (v === '' || v == null || isNaN(Number(v))) return '—';
+    return (Number(v) * 100).toFixed(1) + '%';
+  }
+  function linkifyUrls(text) {
+    if (!text) return '—';
+    return text.split(';').map(part => {
+      const u = part.trim();
+      if (/^https?:\/\//i.test(u)) {
+        const label = u.includes('acc=') ? u.split('acc=')[1] : (u.includes('doi.org/') ? 'DOI' : 'Link');
+        return '<a href="' + esc(u) + '" target="_blank" rel="noopener">' + esc(label) + ' &#8599;</a>';
+      }
+      return esc(u);
+    }).join(' &middot; ');
+  }
+
+  /* Lightbox gallery */
+  const GALLERY = [
+    { src: 'assets/figures/Figure_1_Study_Design.png', cap: 'Figure 1 — Study motivation and traceable evidence design across 44 source contrasts, 15 GEO accessions, and external Epilepsy19 evaluation.' },
+    { src: 'assets/figures/Figure_2_Human_NeuN_Rab_Overlap.png', cap: 'Figure 2 — Human GSE140393 NeuN+ Rab associations (10/14 decreased) and three-species directional overlap (8 shared up, 21 shared down including RAB3A).' },
+    { src: 'assets/figures/Figure_3_Endolysosomal_Contexts.png', cap: 'Figure 3 — Four-panel Rab7/endolysosomal mechanistic core (134 unique genes) across 22 sampled human, mouse, and rat seizure contexts.' },
+    { src: 'assets/figures/Figure_4_NeuN_Concordance.png', cap: 'Figure 4 — Human GSE140393 NeuN+ vs. mouse GSE153976 NeuN+ (9,868 genes) and NeuN- (9,869 genes) compartment concordance.' },
+    { src: 'assets/figures/Figure_5_Rab_Pathway_Forecasts.png', cap: 'Figure 5 — External human neuronal Bayesian forecasting across 14 Rab genes, 27 motivating mechanistic genes, prior sensitivity, and GFAP/VIM/HSPB1 threshold examples.' },
+    { src: 'assets/figures/Supplement_S1_Lysosomal_Trajectories.png', cap: 'Supplement S1 — Lysosomal context and temporal seizure trajectories across compatible rodent strata.' },
+    { src: 'assets/figures/Supplement_S2_Immediate_Early_Context.png', cap: 'Supplement S2 — Acute seizure and immediate-early response context.' },
+    { src: 'assets/figures/Supplement_S4_Concordance_Context.png', cap: 'Supplement S4 — Four-panel cross-species concordance context (mouse and rat).' },
+    { src: 'assets/figures/Supplement_S5_Bayesian_Sensitivity.png', cap: 'Supplement S5 — Harmonized Bayesian prior sensitivity comparison (default, historical, doubled-SD).' }
+  ];
+  let lbIdx = 0;
+  const lb = document.getElementById('lightbox');
+  const lbImg = document.getElementById('lb-img');
+  const lbCap = document.getElementById('lb-cap');
+  const lbRaw = document.getElementById('lb-raw');
+  function openLb(i) {
+    lbIdx = (i + GALLERY.length) % GALLERY.length;
+    lbImg.src = GALLERY[lbIdx].src;
+    lbRaw.href = GALLERY[lbIdx].src;
+    lbCap.textContent = GALLERY[lbIdx].cap;
+    lb.classList.add('open');
+  }
+  document.querySelectorAll('[data-lb]').forEach(el => {
+    el.addEventListener('click', () => openLb(Number(el.getAttribute('data-lb'))));
+  });
+  document.getElementById('lb-prev').addEventListener('click', () => openLb(lbIdx - 1));
+  document.getElementById('lb-next').addEventListener('click', () => openLb(lbIdx + 1));
+  document.getElementById('lb-close').addEventListener('click', () => lb.classList.remove('open'));
+  lb.addEventListener('click', e => { if (e.target === lb) lb.classList.remove('open'); });
+  document.addEventListener('keydown', e => {
+    if (!lb.classList.contains('open')) return;
+    if (e.key === 'Escape') lb.classList.remove('open');
+    if (e.key === 'ArrowLeft') openLb(lbIdx - 1);
+    if (e.key === 'ArrowRight') openLb(lbIdx + 1);
+  });
+
+  /* Data store */
+  const DATA = {};
+  let rabSort = 'pdec';
+  let activeTab = 'rab';
+  let sortCol = null, sortDir = 1;
+
+  function renderRabVisual() {
+    const rows = (DATA.rab || []).slice();
+    rows.sort((a, b) => {
+      if (rabSort === 'gene') return a.Gene.localeCompare(b.Gene);
+      if (rabSort === 'ref') return (Number(a.Reference_log2FC) || 0) - (Number(b.Reference_log2FC) || 0);
+      if (rabSort === 'ext') {
+        const av = a.External_log2FC === '' ? 99 : Number(a.External_log2FC);
+        const bv = b.External_log2FC === '' ? 99 : Number(b.External_log2FC);
+        return av - bv;
+      }
+      const ap = a.Historical_P_decrease === '' ? -1 : Number(a.Historical_P_decrease);
+      const bp = b.Historical_P_decrease === '' ? -1 : Number(b.Historical_P_decrease);
+      return bp - ap;
+    });
+
+    const container = document.getElementById('rab-visual-list');
+    container.innerHTML = rows.map(r => {
+      const hasP = r.Historical_P_decrease !== '';
+      const pDec = hasP ? Number(r.Historical_P_decrease) : null;
+      const pct = hasP ? Math.max(0, Math.min(100, pDec * 100)) : 0;
+      const barCol = !hasP ? '#334155' : (pDec >= 0.65 ? 'linear-gradient(90deg,#0284c7,#10b981)' : (pDec >= 0.50 ? 'linear-gradient(90deg,#1d4ed8,#38bdf8)' : 'linear-gradient(90deg,#b45309,#f59e0b)'));
+      const refSig = r.Reference_adjusted_P !== '' && Number(r.Reference_adjusted_P) < 0.05;
+      const refBadge = r.Reference_log2FC === '' ? '<span class="badge-dir badge-na">n/a</span>'
+        : '<span class="badge-dir ' + (Number(r.Reference_log2FC) < 0 ? 'badge-down' : 'badge-up') + '">' + fmtNum(r.Reference_log2FC, 2) + (refSig ? ' *' : '') + '</span>';
+      const extBadge = r.External_log2FC === '' ? '<span class="badge-dir badge-na">unmapped</span>'
+        : '<span class="badge-dir ' + (Number(r.External_log2FC) < 0 ? 'badge-down' : 'badge-up') + '">' + fmtNum(r.External_log2FC, 2) + ' (p=' + fmtNum(r.External_adjusted_P, 2) + ')</span>';
+      return '<div class="rab-row">' +
+        '<div class="rab-gene">' + esc(r.Gene) + '</div>' +
+        '<div class="rab-metric">Ref: ' + refBadge + '</div>' +
+        '<div class="rab-bar-wrap" title="Historical P(decrease) = ' + (hasP ? pDec.toFixed(3) : 'Unavailable') + '">' +
+          '<div class="rab-bar-fill" style="width:' + pct.toFixed(1) + '%;background:' + barCol + ';"></div>' +
+          '<div class="rab-tick" style="left:50%;" title="0.50"></div>' +
+          '<div class="rab-tick t90" style="left:90%;" title="0.90 threshold"></div>' +
+          '<div class="rab-bar-txt"><span>' + (hasP ? 'P(dec) = ' + pDec.toFixed(3) : 'No eligible historical forecast') + '</span><span>' + (hasP ? 'mean ' + fmtNum(r.Historical_forecast_mean, 3) : '') + '</span></div>' +
+        '</div>' +
+        '<div class="rab-metric">Ext: ' + extBadge + '</div>' +
+      '</div>';
+    }).join('');
+  }
+
+  document.querySelectorAll('#rab-sort-bar .rab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('#rab-sort-bar .rab-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      rabSort = btn.getAttribute('data-sort');
+      renderRabVisual();
+    });
+  });
+
+  const TAB_CONFIG = {
+    rab: {
+      csv: 'assets/data/Table_2_extended_Rab_probabilities.csv',
+      cols: [
+        { k: 'Gene', lbl: 'Gene', cls: 'mono' },
+        { k: 'Reference_log2FC', lbl: 'GSE140393 log2FC', fmt: v => fmtNum(v, 3), num: true },
+        { k: 'Reference_adjusted_P', lbl: 'Ref adj. P', fmt: v => fmtNum(v, 4), num: true },
+        { k: 'Historical_P_decrease', lbl: 'Hist P(decrease)', fmt: v => fmtNum(v, 3), num: true },
+        { k: 'Historical_forecast_mean', lbl: 'Forecast Mean', fmt: v => fmtNum(v, 3), num: true },
+        { k: 'Historical_latent_lower95', lbl: '95% Lo', fmt: v => fmtNum(v, 2), num: true },
+        { k: 'Historical_latent_upper95', lbl: '95% Hi', fmt: v => fmtNum(v, 2), num: true },
+        { k: 'External_log2FC', lbl: 'Epilepsy19 log2FC', fmt: v => fmtNum(v, 3), num: true },
+        { k: 'External_adjusted_P', lbl: 'Ext adj. P', fmt: v => fmtNum(v, 3), num: true },
+        { k: 'Historical_minus_default_log_score', lbl: 'Δ Log-Score', fmt: v => fmtNum(v, 4), num: true }
+      ]
+    },
+    shared: {
+      csv: 'assets/data/Shared_gene_all_three_down.csv',
+      cols: [
+        { k: '_dir', lbl: 'Direction', html: r => r._dir === 'UP' ? '<span class="badge-dir badge-up">ALL-3 UP</span>' : '<span class="badge-dir badge-down">ALL-3 DOWN</span>' },
+        { k: 'HumanSymbol', lbl: 'Human Symbol', cls: 'mono' },
+        { k: 'HumanEnsembl', lbl: 'Ensembl ID', cls: 'mono' },
+        { k: 'HumanLogFC', lbl: 'Human log2FC', fmt: v => fmtNum(v, 3), num: true },
+        { k: 'HumanAdjP', lbl: 'Human adj. P', fmt: v => fmtNum(v, 4), num: true },
+        { k: 'TotalSupportingContrasts', lbl: 'Rodent Contrasts', num: true },
+        { k: '_support', lbl: 'Supporting Rodent Contrast IDs', cls: 'mono' }
+      ]
+    },
+    panels: {
+      csv: 'assets/data/Table_3__panel_forecast_performance.csv',
+      cols: [
+        { k: 'Panel', lbl: 'Predefined Biological Panel' },
+        { k: 'Declared', lbl: 'Declared', num: true },
+        { k: 'Scored', lbl: 'Scored', num: true },
+        { k: 'PointSignAgreementRate', lbl: 'Sign Agreement', fmt: fmtPct, num: true },
+        { k: 'Coverage95', lbl: '95% PI Coverage', fmt: fmtPct, num: true },
+        { k: 'MeanHistoricalMinusDefaultLogScore', lbl: 'Hist − Default Log-Score', fmt: v => fmtNum(v, 4), num: true },
+        { k: 'historical_MeanLogScoreGainVsBaseline', lbl: 'Hist Gain vs Baseline', fmt: v => fmtNum(v, 3), num: true }
+      ]
+    },
+    studies: {
+      csv: 'assets/data/Table_1_extended_source_inventory.csv',
+      cols: [
+        { k: 'Study', lbl: 'Study / GEO', cls: 'mono' },
+        { k: 'EvidenceRole', lbl: 'Evidence Role' },
+        { k: 'Species', lbl: 'Species' },
+        { k: 'Compartment', lbl: 'Compartment & Region', html: r => esc(r.Compartment) + '<br><span style="color:var(--muted);font-size:11px;">' + esc(r.Region) + '</span>' },
+        { k: 'Time', lbl: 'Time / Design' },
+        { k: 'Exposed_Control_N', lbl: 'Exp / Ctrl N' },
+        { k: 'SavedContrasts', lbl: 'Contrasts', num: true },
+        { k: 'DesignCaution', lbl: 'Design Caution' },
+        { k: 'ReferenceURLs', lbl: 'Primary Links', html: r => linkifyUrls(r.ReferenceURLs) }
+      ]
+    },
+    core: {
+      csv: 'assets/data/Table_4_core_and_context_observations.csv',
+      cols: [
+        { k: 'Gene', lbl: 'Gene', cls: 'mono' },
+        { k: 'TrainingCohorts', lbl: 'Training Cohorts', num: true },
+        { k: 'historical_ProbabilityUp', lbl: 'P(increase)', fmt: v => fmtNum(v, 3), num: true },
+        { k: 'historical_ProbabilityDown', lbl: 'P(decrease)', fmt: v => fmtNum(v, 3), num: true },
+        { k: 'historical_Mean', lbl: 'Forecast Mean', fmt: v => fmtNum(v, 3), num: true },
+        { k: 'ObservedEffect', lbl: 'Epilepsy19 log2FC', fmt: v => fmtNum(v, 3), num: true },
+        { k: 'ObservedAdjustedP', lbl: 'Ext adj. P', fmt: v => fmtNum(v, 4), num: true },
+        { k: 'HistoricalMinusDefaultLogScore', lbl: 'Δ Log-Score', fmt: v => fmtNum(v, 4), num: true }
+      ]
+    }
+  };
+
+  function renderTable() {
+    const cfg = TAB_CONFIG[activeTab];
+    const q = (document.getElementById('tbl-search').value || '').trim().toLowerCase();
+    let rows = (DATA[activeTab] || []).slice();
+    if (q) {
+      rows = rows.filter(r => Object.values(r).some(v => String(v || '').toLowerCase().includes(q)));
+    }
+    if (sortCol) {
+      const colObj = cfg.cols.find(c => c.k === sortCol);
+      rows.sort((a, b) => {
+        const av = a[sortCol], bv = b[sortCol];
+        if (colObj && colObj.num) {
+          const an = av === '' || av == null || isNaN(Number(av)) ? -1e9 : Number(av);
+          const bn = bv === '' || bv == null || isNaN(Number(bv)) ? -1e9 : Number(bv);
+          return (an - bn) * sortDir;
+        }
+        return String(av || '').localeCompare(String(bv || '')) * sortDir;
+      });
+    }
+
+    document.getElementById('tbl-count').textContent = 'Showing ' + rows.length + ' of ' + (DATA[activeTab] || []).length + ' rows';
+    document.getElementById('tbl-csv-link').href = cfg.csv;
+
+    const head = document.getElementById('tbl-head');
+    head.innerHTML = '<tr>' + cfg.cols.map(c => {
+      const arrow = sortCol === c.k ? (sortDir === 1 ? ' ▲' : ' ▼') : '';
+      return '<th data-col="' + esc(c.k) + '">' + esc(c.lbl) + arrow + '</th>';
+    }).join('') + '</tr>';
+
+    head.querySelectorAll('th').forEach(th => {
+      th.addEventListener('click', () => {
+        const k = th.getAttribute('data-col');
+        if (sortCol === k) sortDir *= -1;
+        else { sortCol = k; sortDir = 1; }
+        renderTable();
+      });
+    });
+
+    const body = document.getElementById('tbl-body');
+    if (!rows.length) {
+      body.innerHTML = '<tr><td colspan="' + cfg.cols.length + '" style="padding:18px;color:var(--muted);">No rows match your filter.</td></tr>';
+      return;
+    }
+    body.innerHTML = rows.map(r => '<tr>' + cfg.cols.map(c => {
+      const inner = c.html ? c.html(r) : esc(c.fmt ? c.fmt(r[c.k]) : (r[c.k] || '—'));
+      return '<td' + (c.cls ? ' class="' + c.cls + '"' : '') + '>' + inner + '</td>';
+    }).join('') + '</tr>').join('');
+  }
+
+  document.querySelectorAll('#data-tabs .tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('#data-tabs .tab-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      activeTab = btn.getAttribute('data-tab');
+      sortCol = null; sortDir = 1;
+      renderTable();
+    });
+  });
+  document.getElementById('tbl-search').addEventListener('input', renderTable);
+
+  Promise.all([
+    fetch('assets/data/Table_2_extended_Rab_probabilities.csv').then(r => r.text()).then(parseCSV),
+    fetch('assets/data/Shared_gene_all_three_up.csv').then(r => r.text()).then(parseCSV),
+    fetch('assets/data/Shared_gene_all_three_down.csv').then(r => r.text()).then(parseCSV),
+    fetch('assets/data/Table_3__panel_forecast_performance.csv').then(r => r.text()).then(parseCSV),
+    fetch('assets/data/Table_1_extended_source_inventory.csv').then(r => r.text()).then(parseCSV),
+    fetch('assets/data/Table_4_core_and_context_observations.csv').then(r => r.text()).then(parseCSV)
+  ]).then(([rab, up, down, panels, studies, core]) => {
+    DATA.rab = rab;
+    DATA.shared = up.map(r => Object.assign({}, r, { _dir: 'UP', _support: r.UpSupportingContrastIDs }))
+      .concat(down.map(r => Object.assign({}, r, { _dir: 'DOWN', _support: r.DownSupportingContrastIDs })));
+    DATA.panels = panels;
+    DATA.studies = studies;
+    DATA.core = core;
+    renderRabVisual();
+    renderTable();
+  }).catch(err => {
+    document.getElementById('tbl-body').innerHTML = '<tr><td style="padding:18px;color:#fda4af;">Failed to load CSV data: ' + esc(err.message) + '</td></tr>';
+  });
+})();
+</script>
+</body>
+</html>
